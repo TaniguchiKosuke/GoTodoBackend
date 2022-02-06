@@ -3,15 +3,36 @@ package service
 import (
 	"GoTodoBackend/db"
 	"GoTodoBackend/entity"
-	"fmt"
+
+	"github.com/gin-gonic/gin"
 )
 
 type TodoService struct {}
 
 type Todo entity.Todo
 
-func (ts *TodoService) GetAllTodoModel() {
+func (ts *TodoService) GetAllTodoModel() ([]Todo, error) {
 	db := db.GetDB()
 	var todo []Todo
-	fmt.Println(db, todo)
+	
+	if err := db.Find(&todo).Error; err != nil {
+		return todo, err
+	}
+
+	return todo, nil
+}
+
+func (ts *TodoService) CreateTodoModel(c *gin.Context) (Todo, error) {
+	db := db.GetDB()
+	var todo Todo
+
+	if err := c.BindJSON(&todo); err != nil {
+		return todo, err
+	}
+
+	if err := db.Create(&todo).Error; err != nil {
+		return todo, err
+	}
+
+	return todo, nil
 }

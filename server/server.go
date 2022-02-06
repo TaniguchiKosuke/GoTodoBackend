@@ -29,6 +29,7 @@ func router() *gin.Engine {
 	{
 		ctrl := controller.TodoController{}
 		todo.GET("", ctrl.GetAllTodo)
+		todo.POST("", ctrl.CreateTodo)
 	}
 
     return r
