@@ -1,7 +1,9 @@
 package entity
 
+import "gorm.io/gorm"
+
 type Todo struct {
-	ID      uint   `json:"id"`
+	*gorm.Model
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
