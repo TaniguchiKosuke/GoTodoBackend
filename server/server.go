@@ -32,6 +32,7 @@ func router() *gin.Engine {
 		todo.POST("", ctrl.CreateTodo)
 		todo.PUT("/:id", ctrl.UpdateTodo)
 		todo.GET("/:id", ctrl.GetTodoById)
+		todo.DELETE("/:id", ctrl.DeleteTodoById)
 	}
 
     return r

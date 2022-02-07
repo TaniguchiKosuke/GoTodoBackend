@@ -59,3 +59,17 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 	}
 	c.JSON(200, todo)
 }
+
+func (tc *TodoController) DeleteTodoById(c *gin.Context) {
+	var ts service.TodoService
+	id := c.Param("id")
+	err := ts.DeleteTodoModelById(c, id)
+	
+	if err != nil {
+		c.AbortWithStatus(403)
+		log.Println(err)
+		return
+	}
+	c.JSON(200, gin.H{id: "deleted"})
+
+}

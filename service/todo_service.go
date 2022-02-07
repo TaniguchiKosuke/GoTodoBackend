@@ -63,3 +63,14 @@ func (ts *TodoService) GetTodoModelById(c *gin.Context, id string) (Todo, error)
 
 	return todo, nil
 }
+
+func (ts *TodoService) DeleteTodoModelById(c *gin.Context, id string) error {
+	db := db.GetDB()
+	var todo Todo
+
+	if err := db.Where("id = ?", id).Delete(&todo).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
