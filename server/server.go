@@ -30,6 +30,7 @@ func router() *gin.Engine {
 		ctrl := controller.TodoController{}
 		todo.GET("", ctrl.GetAllTodo)
 		todo.POST("", ctrl.CreateTodo)
+		todo.PUT("/:id", ctrl.UpdateTodo)
 	}
 
     return r

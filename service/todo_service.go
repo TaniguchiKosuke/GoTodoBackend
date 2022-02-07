@@ -36,3 +36,18 @@ func (ts *TodoService) CreateTodoModel(c *gin.Context) (Todo, error) {
 
 	return todo, nil
 }
+
+func (ts *TodoService) GetTodoModelById(c *gin.Context, id string) (Todo, error) {
+	db := db.GetDB()
+	var todo Todo
+	if err := db.Where("id = ?", id).Find(&todo).Error; err != nil {
+		return todo, err
+	}
+
+	if err := c.BindJSON(&todo); err != nil {
+		return todo, err
+	}
+
+	db.Save(&todo)
+	return todo, nil
+}

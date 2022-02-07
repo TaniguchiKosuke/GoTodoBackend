@@ -33,3 +33,16 @@ func (tc *TodoController) CreateTodo(c *gin.Context) {
 
 	c.JSON(201, todo)
 }
+
+func (tc *TodoController) UpdateTodo(c *gin.Context) {
+	var ts service.TodoService
+	id := c.Param("id")
+	todo, err := ts.GetTodoModelById(c, id)
+
+	if err != nil {
+		c.AbortWithStatus(400)
+		log.Println(err)
+		return
+	}
+	c.JSON(200, todo)
+}
