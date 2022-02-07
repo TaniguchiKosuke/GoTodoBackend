@@ -37,10 +37,23 @@ func (tc *TodoController) CreateTodo(c *gin.Context) {
 func (tc *TodoController) UpdateTodo(c *gin.Context) {
 	var ts service.TodoService
 	id := c.Param("id")
-	todo, err := ts.GetTodoModelById(c, id)
+	todo, err := ts.UpdateTodoModelById(c, id)
 
 	if err != nil {
 		c.AbortWithStatus(400)
+		log.Println(err)
+		return
+	}
+	c.JSON(200, todo)
+}
+
+func (tc *TodoController) GetTodoById(c *gin.Context) {
+	var ts service.TodoService
+	id := c.Param("id")
+	todo, err := ts.GetTodoModelById(c, id)
+
+	if err != nil {
+		c.AbortWithStatus(404)
 		log.Println(err)
 		return
 	}
