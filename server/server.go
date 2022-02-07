@@ -2,7 +2,10 @@ package server
 
 import (
 	"GoTodoBackend/controller"
+	"GoTodoBackend/service"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,25 +17,33 @@ func Init() {
 
 func router() *gin.Engine {
     r := gin.Default()
+	store := cookie.NewStore([]byte("secret"))
+    r.Use(sessions.Sessions("mysession", store))
 
     u := r.Group("/user")
     {
-        ctrl := controller.Controller{}
-        u.GET("", ctrl.Index)
-        u.GET("/:id", ctrl.GetUserById)
-        u.POST("", ctrl.RegisterUser)
-        u.PUT("/:id", ctrl.UpdateUserById)
-        u.DELETE("/:id", ctrl.DeleteUserById)
+        userCtrl := controller.Controller{}
+        u.GET("", userCtrl.Index)
+        u.GET("/:id", userCtrl.GetUserById)
+        u.POST("/signin", userCtrl.RegisterUser)
+        u.PUT("/:id", userCtrl.UpdateUserById)
+        u.DELETE("/:id", userCtrl.DeleteUserById)
+		u.POST("/login", userCtrl.Login)
+		u.Use(service.SessionCheck())
+		{
+			u.POST("/logout",userCtrl.Logout)
+		}
     }
-
+	
 	todo := r.Group("/api")
+	todo.Use(service.SessionCheck())
 	{
-		ctrl := controller.TodoController{}
-		todo.GET("", ctrl.GetAllTodo)
-		todo.POST("", ctrl.CreateTodo)
-		todo.PUT("/:id", ctrl.UpdateTodo)
-		todo.GET("/:id", ctrl.GetTodoById)
-		todo.DELETE("/:id", ctrl.DeleteTodoById)
+		todoCtrl := controller.TodoController{}
+		todo.GET("/todos", todoCtrl.GetAllTodo)
+		todo.POST("/todo/create", todoCtrl.CreateTodo)
+		todo.PUT("/todo/:id", todoCtrl.UpdateTodo)
+		todo.GET("/todo/:id", todoCtrl.GetTodoById)
+		todo.DELETE("/todo/:id", todoCtrl.DeleteTodoById)
 	}
 
     return r

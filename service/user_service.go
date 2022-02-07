@@ -3,7 +3,10 @@ package service
 import (
 	"GoTodoBackend/db"
 	"GoTodoBackend/entity"
+	"encoding/json"
+	"log"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -89,4 +92,61 @@ func (s Service) DeleteUserModelByID(id string) error {
     }
 
     return nil
+}
+
+type LoginInfo struct {
+	Email string
+	Password string
+}
+
+type SessionInfo struct {
+	UserId interface{}
+}
+
+func (s Service) LoginUserModel(c *gin.Context) error {
+	db := db.GetDB()
+	var loginInfo *LoginInfo
+	var user User
+	data, err := c.GetRawData()
+	if err != nil {
+		return err
+	}
+
+	if err := json.Unmarshal(data, &loginInfo); err != nil {
+		return err
+	}
+
+	email := loginInfo.Email
+	password := loginInfo.Password
+	if err := db.Where("email = ?", email).Find(&user).Error; err != nil {
+		return err
+	}
+
+	hashedPassword := user.Password
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err != nil {
+		return err
+	}
+
+	session := sessions.Default(c)
+    session.Set("UserId", email)
+    session.Save()
+
+	return nil
+}
+
+func SessionCheck() gin.HandlerFunc {
+    return func(c *gin.Context) {
+		var sessionInfo SessionInfo
+        session := sessions.Default(c)
+        sessionInfo.UserId = session.Get("UserId")
+
+        // セッションがない場合、ログインフォームをだす
+        if sessionInfo.UserId == nil {
+			log.Println("Not logged in")
+            c.Abort() // これがないと続けて処理されてしまう
+        } else {
+            c.Set("UserId", sessionInfo.UserId) // ユーザidをセット
+            c.Next()
+        }
+    }
 }

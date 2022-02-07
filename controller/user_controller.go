@@ -3,7 +3,9 @@ package controller
 import (
 	"GoTodoBackend/service"
 	"fmt"
+	"log"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -73,4 +75,22 @@ func (pc Controller) DeleteUserById(c *gin.Context) {
 		return
     }
     c.JSON(204, gin.H{"id #" + id: "deleted"})
+}
+
+func (pc Controller) Login(c *gin.Context) {
+	var s service.Service
+	
+	if err := s.LoginUserModel(c); err != nil {
+		c.AbortWithStatus(401)
+		log.Println(err)
+		return
+	}
+	c.JSON(200, gin.H{"status": "Login successed"})
+}
+
+func (pc Controller) Logout(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+	c.JSON(200, gin.H{"status": "successed"})
 }
