@@ -15,17 +15,17 @@ func Init() {
 func router() *gin.Engine {
     r := gin.Default()
 
-    u := r.Group("/users")
+    u := r.Group("/user")
     {
         ctrl := controller.Controller{}
         u.GET("", ctrl.Index)
-        u.GET("/:id", ctrl.Show)
-        u.POST("", ctrl.Create)
-        u.PUT("/:id", ctrl.Update)
-        u.DELETE("/:id", ctrl.Delete)
+        u.GET("/:id", ctrl.GetUserById)
+        u.POST("", ctrl.RegisterUser)
+        u.PUT("/:id", ctrl.UpdateUserById)
+        u.DELETE("/:id", ctrl.DeleteUserById)
     }
 
-	todo := r.Group("/todo")
+	todo := r.Group("/api")
 	{
 		ctrl := controller.TodoController{}
 		todo.GET("", ctrl.GetAllTodo)

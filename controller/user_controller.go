@@ -23,9 +23,9 @@ func (pc Controller) Index(c *gin.Context) {
 }
 
 // Create action: POST /users
-func (pc Controller) Create(c *gin.Context) {
+func (pc Controller) RegisterUser(c *gin.Context) {
     var s service.Service
-    p, err := s.CreateModel(c)
+    p, err := s.RegisterUserModel(c)
 
     if err != nil {
         c.AbortWithStatus(400)
@@ -36,10 +36,10 @@ func (pc Controller) Create(c *gin.Context) {
 }
 
 // Show action: GET /users/:id
-func (pc Controller) Show(c *gin.Context) {
+func (pc Controller) GetUserById(c *gin.Context) {
     id := c.Params.ByName("id")
     var s service.Service
-    p, err := s.GetByID(id)
+    p, err := s.GetUserModelByID(id)
 
     if err != nil {
         c.AbortWithStatus(404)
@@ -50,10 +50,10 @@ func (pc Controller) Show(c *gin.Context) {
 }
 
 // Update action: PUT /users/:id
-func (pc Controller) Update(c *gin.Context) {
+func (pc Controller) UpdateUserById(c *gin.Context) {
     id := c.Params.ByName("id")
     var s service.Service
-    p, err := s.UpdateByID(id, c)
+    p, err := s.UpdateUserModelByID(id, c)
 
     if err != nil {
         c.AbortWithStatus(400)
@@ -63,11 +63,11 @@ func (pc Controller) Update(c *gin.Context) {
 }
 
 // Delete action: DELETE /users/:id
-func (pc Controller) Delete(c *gin.Context) {
+func (pc Controller) DeleteUserById(c *gin.Context) {
     id := c.Params.ByName("id")
     var s service.Service
 
-    if err := s.DeleteByID(id); err != nil {
+    if err := s.DeleteUserModelByID(id); err != nil {
         c.AbortWithStatus(403)
         fmt.Println(err)
 		return

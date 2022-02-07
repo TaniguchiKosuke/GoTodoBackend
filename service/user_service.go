@@ -5,6 +5,7 @@ import (
 	"GoTodoBackend/entity"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Service procides user's behavior
@@ -26,13 +27,20 @@ func (s Service) GetAll() ([]User, error) {
 }
 
 // CreateModel is create User model
-func (s Service) CreateModel(c *gin.Context) (User, error) {
+func (s Service) RegisterUserModel(c *gin.Context) (User, error) {
     db := db.GetDB()
     var u User
 
     if err := c.BindJSON(&u); err != nil {
         return u, err
     }
+
+	//Hashing the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+	if err != nil {
+		return u, err
+	}
+	u.Password = string(hashedPassword)
 
     if err := db.Create(&u).Error; err != nil {
         return u, err
@@ -42,7 +50,7 @@ func (s Service) CreateModel(c *gin.Context) (User, error) {
 }
 
 // GetByID is get a User
-func (s Service) GetByID(id string) (User, error) {
+func (s Service) GetUserModelByID(id string) (User, error) {
     db := db.GetDB()
     var u User
 
@@ -54,7 +62,7 @@ func (s Service) GetByID(id string) (User, error) {
 }
 
 // UpdateByID is update a User
-func (s Service) UpdateByID(id string, c *gin.Context) (User, error) {
+func (s Service) UpdateUserModelByID(id string, c *gin.Context) (User, error) {
     db := db.GetDB()
     var u User
 
@@ -72,7 +80,7 @@ func (s Service) UpdateByID(id string, c *gin.Context) (User, error) {
 }
 
 // DeleteByID is delete a User
-func (s Service) DeleteByID(id string) error {
+func (s Service) DeleteUserModelByID(id string) error {
     db := db.GetDB()
     var u User
 
