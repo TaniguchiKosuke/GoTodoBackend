@@ -11,11 +11,15 @@ type TodoService struct {}
 
 type Todo entity.Todo
 
-func (ts *TodoService) GetAllTodoModel() ([]Todo, error) {
+func (ts *TodoService) GetAllTodoModel(c *gin.Context) ([]Todo, error) {
 	db := db.GetDB()
 	var todo []Todo
+	requestUser, err := GetRequestUser(c)
+	if err != nil {
+		return todo, err
+	}
 	
-	if err := db.Find(&todo).Error; err != nil {
+	if err := db.Where("user_id = ?", requestUser.Uuid).Find(&todo).Error; err != nil {
 		return todo, err
 	}
 

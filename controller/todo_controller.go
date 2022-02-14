@@ -11,7 +11,7 @@ type TodoController struct{}
 
 func (tc *TodoController) GetAllTodo(c *gin.Context) {
 	var ts service.TodoService
-	todo, err := ts.GetAllTodoModel()
+	todo, err := ts.GetAllTodoModel(c)
 	
 	if err != nil {
 		c.AbortWithStatus(404)
