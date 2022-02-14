@@ -34,6 +34,14 @@ func (ts *TodoService) CreateTodoModel(c *gin.Context) (Todo, error) {
 		return todo, err
 	}
 
+	requestUser, err := GetRequestUserId(c)
+	if err != nil {
+		return todo, err
+	}
+
+	todo.UserID = requestUser.ID
+	db.Save(&todo)
+
 	return todo, nil
 }
 

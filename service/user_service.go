@@ -30,7 +30,7 @@ func (s Service) GetAll() ([]User, error) {
 }
 
 // CreateModel is create User model
-func (s Service) RegisterUserModel(c *gin.Context) (User, error) {
+func (s *Service) RegisterUserModel(c *gin.Context) (User, error) {
     db := db.GetDB()
     var u User
 
@@ -53,7 +53,7 @@ func (s Service) RegisterUserModel(c *gin.Context) (User, error) {
 }
 
 // GetByID is get a User
-func (s Service) GetUserModelByID(id string) (User, error) {
+func (s *Service) GetUserModelByID(id string) (User, error) {
     db := db.GetDB()
     var u User
 
@@ -65,7 +65,7 @@ func (s Service) GetUserModelByID(id string) (User, error) {
 }
 
 // UpdateByID is update a User
-func (s Service) UpdateUserModelByID(id string, c *gin.Context) (User, error) {
+func (s *Service) UpdateUserModelByID(id string, c *gin.Context) (User, error) {
     db := db.GetDB()
     var u User
 
@@ -83,7 +83,7 @@ func (s Service) UpdateUserModelByID(id string, c *gin.Context) (User, error) {
 }
 
 // DeleteByID is delete a User
-func (s Service) DeleteUserModelByID(id string) error {
+func (s *Service) DeleteUserModelByID(id string) error {
     db := db.GetDB()
     var u User
 
@@ -103,7 +103,7 @@ type SessionInfo struct {
 	UserId interface{}
 }
 
-func (s Service) LoginUserModel(c *gin.Context) error {
+func (s *Service) LoginUserModel(c *gin.Context) error {
 	db := db.GetDB()
 	var loginInfo *LoginInfo
 	var user User
@@ -128,7 +128,7 @@ func (s Service) LoginUserModel(c *gin.Context) error {
 	}
 
 	session := sessions.Default(c)
-    session.Set("UserId", email)
+    session.Set("UserId", user.ID)
     session.Save()
 
 	return nil
@@ -149,4 +149,17 @@ func SessionCheck() gin.HandlerFunc {
             c.Next()
         }
     }
+}
+
+func GetRequestUserId(c *gin.Context) (User, error) {
+	session := sessions.Default(c)
+	requestUserId := session.Get("UserId")
+	var user *User
+
+	db := db.GetDB()
+	if err := db.Find(&user, "id = ?", requestUserId).Error; err != nil {
+		return *user, err
+	}
+
+	return *user, nil
 }

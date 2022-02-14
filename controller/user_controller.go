@@ -13,7 +13,7 @@ import (
 type Controller struct{}
 
 // Index action: GET /users
-func (pc Controller) Index(c *gin.Context) {
+func (pc *Controller) Index(c *gin.Context) {
     var s service.Service
     p, err := s.GetAll()
 
@@ -25,7 +25,7 @@ func (pc Controller) Index(c *gin.Context) {
 }
 
 // Create action: POST /users
-func (pc Controller) RegisterUser(c *gin.Context) {
+func (pc *Controller) RegisterUser(c *gin.Context) {
     var s service.Service
     p, err := s.RegisterUserModel(c)
 
@@ -38,7 +38,7 @@ func (pc Controller) RegisterUser(c *gin.Context) {
 }
 
 // Show action: GET /users/:id
-func (pc Controller) GetUserById(c *gin.Context) {
+func (pc *Controller) GetUserById(c *gin.Context) {
     id := c.Params.ByName("id")
     var s service.Service
     p, err := s.GetUserModelByID(id)
@@ -52,7 +52,7 @@ func (pc Controller) GetUserById(c *gin.Context) {
 }
 
 // Update action: PUT /users/:id
-func (pc Controller) UpdateUserById(c *gin.Context) {
+func (pc *Controller) UpdateUserById(c *gin.Context) {
     id := c.Params.ByName("id")
     var s service.Service
     p, err := s.UpdateUserModelByID(id, c)
@@ -65,7 +65,7 @@ func (pc Controller) UpdateUserById(c *gin.Context) {
 }
 
 // Delete action: DELETE /users/:id
-func (pc Controller) DeleteUserById(c *gin.Context) {
+func (pc *Controller) DeleteUserById(c *gin.Context) {
     id := c.Params.ByName("id")
     var s service.Service
 
@@ -77,7 +77,7 @@ func (pc Controller) DeleteUserById(c *gin.Context) {
     c.JSON(204, gin.H{"id #" + id: "deleted"})
 }
 
-func (pc Controller) Login(c *gin.Context) {
+func (pc *Controller) Login(c *gin.Context) {
 	var s service.Service
 	
 	if err := s.LoginUserModel(c); err != nil {
@@ -88,7 +88,7 @@ func (pc Controller) Login(c *gin.Context) {
 	c.JSON(200, gin.H{"status": "Login successed"})
 }
 
-func (pc Controller) Logout(c *gin.Context) {
+func (pc *Controller) Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
