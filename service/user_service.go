@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/google/uuid"
 )
 
 // Service procides user's behavior
@@ -20,74 +21,81 @@ type User entity.User
 // GetAll is get all User
 func (s Service) GetAll() ([]User, error) {
     db := db.GetDB()
-    var u []User
+    var user []User
 
-    if err := db.Find(&u).Error; err != nil {
+    if err := db.Find(&user).Error; err != nil {
         return nil, err
     }
 
-    return u, nil
+    return user, nil
 }
 
 // CreateModel is create User model
 func (s *Service) RegisterUserModel(c *gin.Context) (User, error) {
     db := db.GetDB()
-    var u User
+    var user User
 
-    if err := c.BindJSON(&u); err != nil {
-        return u, err
+    if err := c.BindJSON(&user); err != nil {
+        return user, err
     }
 
 	//Hashing the password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
-		return u, err
+		return user, err
 	}
-	u.Password = string(hashedPassword)
+	user.Password = string(hashedPassword)
 
-    if err := db.Create(&u).Error; err != nil {
-        return u, err
+	u, err := uuid.NewRandom()
+	if err != nil {
+			return user, err
+	}
+	userUuid := u.String()
+	user.Uuid = userUuid
+
+    if err := db.Create(&user).Error; err != nil {
+        return user, err
     }
 
-    return u, nil
+    return user, nil
 }
 
 // GetByID is get a User
 func (s *Service) GetUserModelByID(id string) (User, error) {
     db := db.GetDB()
-    var u User
+    var user User
 
-    if err := db.Where("id = ?", id).First(&u).Error; err != nil {
-        return u, err
+    if err := db.Where("uuid = ?", id).First(&user).Error; err != nil {
+        return user, err
     }
 
-    return u, nil
+    return user, nil
 }
 
 // UpdateByID is update a User
 func (s *Service) UpdateUserModelByID(id string, c *gin.Context) (User, error) {
     db := db.GetDB()
-    var u User
+    var user User
 
-    if err := db.Where("id = ?", id).First(&u).Error; err != nil {
-        return u, err
+    if err := db.Where("uuid = ?", id).First(&user).Error; err != nil {
+        return user, err
     }
 
-    if err := c.BindJSON(&u); err != nil {
-        return u, err
+    if err := c.BindJSON(&user); err != nil {
+        return user, err
     }
 
-    db.Save(&u)
+    db.Save(&user)
 
-    return u, nil
+    return user, nil
 }
 
 // DeleteByID is delete a User
 func (s *Service) DeleteUserModelByID(id string) error {
     db := db.GetDB()
-    var u User
+    var user User
 
-    if err := db.Where("id = ?", id).Delete(&u).Error; err != nil {
+    if err := db.Where("uuid = ?", id).Delete(&user).Error; err != nil {
         return err
     }
 
@@ -128,7 +136,7 @@ func (s *Service) LoginUserModel(c *gin.Context) error {
 	}
 
 	session := sessions.Default(c)
-    session.Set("UserId", user.ID)
+    session.Set("UserId", user.Uuid)
     session.Save()
 
 	return nil
@@ -151,13 +159,13 @@ func SessionCheck() gin.HandlerFunc {
     }
 }
 
-func GetRequestUserId(c *gin.Context) (User, error) {
+func GetRequestUser(c *gin.Context) (User, error) {
 	session := sessions.Default(c)
 	requestUserId := session.Get("UserId")
 	var user *User
 
 	db := db.GetDB()
-	if err := db.Find(&user, "id = ?", requestUserId).Error; err != nil {
+	if err := db.Find(&user, "uuid = ?", requestUserId).Error; err != nil {
 		return *user, err
 	}
 

@@ -8,11 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// var (
-//     db *gorm.DB
-//     err error
-// )
-
 func Init() {
 	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
     if err != nil {

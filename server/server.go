@@ -25,7 +25,7 @@ func router() *gin.Engine {
         userCtrl := controller.Controller{}
         u.GET("", userCtrl.Index)
         u.GET("/:id", userCtrl.GetUserById)
-        u.POST("/signin", userCtrl.RegisterUser)
+        u.POST("/signup", userCtrl.RegisterUser)
         u.PUT("/:id", userCtrl.UpdateUserById)
         u.DELETE("/:id", userCtrl.DeleteUserById)
 		u.POST("/login", userCtrl.Login)
